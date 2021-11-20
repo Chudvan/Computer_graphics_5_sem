@@ -1,0 +1,28 @@
+template<typename T>
+class Edge {
+	Point<T> first, second;
+public:
+	Edge(Point<T>& first, Point<T>& second)
+		: first(first),
+		second(second) {}
+
+	Vector<T> get_normal() {
+		return Vector<T>(first.y - second.y, second.x - first.x, 0);
+	}
+
+	Vector<T> get_vector() {
+		return Vector<T>(second.x - first.x, second.y - first.y, 0);
+	}
+
+	Point<T> get_start() {
+		return first;
+	}
+
+	Point<T> get_end() {
+		return second;
+	}
+
+	Point<T> get_middle() {
+		return Point<T> ((first.x + second.x) / 2, (first.y + second.y) / 2);
+	}
+};

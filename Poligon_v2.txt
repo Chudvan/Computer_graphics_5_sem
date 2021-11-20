@@ -1,0 +1,55 @@
+template<typename T>
+class Poligon {
+	Edge<T> **edges;
+	int n;
+
+	void _create_edges(Point<T> **p, int n_) {
+		edges = new Edge<T> *[n_];
+		for (int i = 0; i < n_; i++) {
+			edges[i] = new Edge<T>(*p[i], *p[(i + 1) % n_]);
+		}
+	}
+
+public:
+	Poligon(Point<T> **p, int n_) {
+		_create_edges(p, n_);
+		n = n_;
+	}
+
+	bool is_simple() {
+		Edge<T> *edge = nullptr;
+		bool is_intersect = false;
+		for (int i = 0; i < n; i++) {
+			edge = edges[i];
+			for (int j = i + 2; j < ((i == 0) ? n - 1 : n); j++)
+				is_intersect |= intersect(*edge, *edges[j]);
+			if (is_intersect) return false;
+		}
+		return true;
+	}
+
+	int get_n() {
+		return n;
+	}
+
+	Edge<T> **get_edges() {
+		return edges;
+	}
+
+	bool is_convex() {
+		Edge<T> *edge = nullptr;
+		int size_orientation = 7;
+		T *orientation_ = (T *)calloc(size_orientation, sizeof(T));
+		for (int i = 0; i < n; i++) {
+			edge = edges[i];
+			for (int j = 0; j < n - 2; j++)
+				orientation_[classify(*edge, edges[(i + j + 1) % n]->get_end())] += 1;
+			if (orientation_[0] > 0 && orientation_[1] > 0)
+				return false;
+			delete orientation_;
+			orientation_ = (T *)calloc(size_orientation, sizeof(T));
+		}
+		return true;
+	}
+
+};

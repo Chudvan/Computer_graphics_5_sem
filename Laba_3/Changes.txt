@@ -1,0 +1,51 @@
+В Graphics.cpp:
+template <typename T>
+Vector4<T> operator*(const Vector4<T>& v, const Matrix<T>& mx) {
+	Vector4<T> v_2(0, 0, 0, 0);
+	for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < 4; i++) {
+			v_2[j] += mx.m[i][j] * v[i];
+		}
+	}
+	return v_2;
+}
+
+template<typename T>
+class Edge3 {
+	Vector<T> first, second;
+public:
+	Edge3(Vector<T>& first, Vector<T>& second)
+		: first(first),
+		second(second) {}
+
+	Vector<T> get_vector() {
+		return (second - first);
+	}
+
+	Vector<T> get_start() {
+		return first;
+	}
+
+	Vector<T> get_end() {
+		return second;
+	}
+
+	Point<T> get_middle() {
+		return (first + second) / 2;
+	}
+
+	void set_start(Vector<T> &v) {
+		first = v;
+	}
+
+	void set_end(Vector<T> &v) {
+		second = v;
+	}
+};
+
+В Vector.h:
+template<class TYPE> class Vector4;
+
+operator Vector4<TYPE>() { return Vector4<TYPE>(x, y, z, 1); }
+
+operator Vector<TYPE>() { return Vector<TYPE>(x, y, z); }

@@ -1,0 +1,51 @@
+	*/
+	//gfDisplayMessage("Message!");
+	/*
+	//std::stringstream ss;
+	//ss << p.is_simple();
+	//gfDrawText(200, 200, ss.str().c_str(), RGBPIXEL(0, 128, 255));
+	/*
+	Edge<int> e(Point<int>(100, 200), Point<int>(200, 100));
+	orientation res = classify(e, Point<int>(100, 200));
+	switch (res) {
+	case LEFT:
+		gfDrawText(200, 200, "LEFT", RGBPIXEL(0, 128, 255));
+		break;
+	case RIGHT:
+		gfDrawText(200, 200, "RIGHT", RGBPIXEL(0, 128, 255));
+		break;
+	case BEYOND:
+		gfDrawText(200, 200, "BEYOND", RGBPIXEL(0, 128, 255));
+		break;
+	case BEHIND:
+		gfDrawText(200, 200, "BEHIND", RGBPIXEL(0, 128, 255));
+		break;
+	case ORIGIN:
+		gfDrawText(200, 200, "ORIGIN", RGBPIXEL(0, 128, 255));
+		break;
+	case DEST:
+		gfDrawText(200, 200, "DEST", RGBPIXEL(0, 128, 255));
+		break;
+	case BETWEEN:
+		gfDrawText(200, 200, "BETWEEN", RGBPIXEL(0, 128, 255));
+		break;
+	}
+	*/
+	/*
+	Edge<int> e(Point<int>(100, 200), Point<int>(200, 100));
+	edge_type res = edge_type_classify(e, Point<int>(10, 300));
+	switch (res) {
+	case CROSSLEFT:
+		gfDrawText(200, 200, "CROSSLEFT", RGBPIXEL(0, 128, 255));
+		break;
+	case CROSSRIGHT:
+		gfDrawText(200, 200, "CROSSRIGHT", RGBPIXEL(0, 128, 255));
+		break;
+	case INESSENTIAL:
+		gfDrawText(200, 200, "INESSENTIAL", RGBPIXEL(0, 128, 255));
+		break;
+	case TOUCHING:
+		gfDrawText(200, 200, "TOUCHING", RGBPIXEL(0, 128, 255));
+		break;
+	}
+	*/

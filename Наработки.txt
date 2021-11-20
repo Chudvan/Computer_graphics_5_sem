@@ -1,0 +1,91 @@
+(int)intersect(*edge, *edges[j])
+
+
+//gfDrawText(j * 100, i * 100, std::to_string(j).c_str(), RGBPIXEL(0, 128, 255));
+
+std::string s1 = std::to_string(edges[j]->get_start().x) + ";" + std::to_string(edges[j]->get_start().y);
+				std::string s2 = std::to_string(edges[j]->get_end().x) + ";" + std::to_string(edges[j]->get_end().y);
+				gfDrawText(j * 70, i * 50, s1.c_str(), RGBPIXEL(0, 128, 255));
+				gfDrawText(j * 70, i * 50 + 15, s2.c_str(), RGBPIXEL(0, 128, 255));
+
+gfDrawText(n * 70, i * 50, std::to_string(orientation_[0]).c_str(), RGBPIXEL(0, 128, 255));
+			gfDrawText(n * 70, i * 50 + 15, std::to_string(orientation_[1]).c_str(), RGBPIXEL(0, 128, 255));
+
+
+std::string s1 = std::to_string(edges[(i + j + 1) % n]->get_start().x) + ";" + std::to_string(edges[(i + j + 1) % n]->get_start().y);
+				std::string s2 = std::to_string(edges[(i + j + 1) % n]->get_end().x) + ";" + std::to_string(edges[(i + j + 1) % n]->get_end().y);
+				gfDrawText(j * 70, i * 50, s1.c_str(), RGBPIXEL(0, 128, 255));
+				gfDrawText(j * 70, i * 50 + 15, s2.c_str(), RGBPIXEL(0, 128, 255));
+
+gfDrawText(n * 70, i * 50, std::to_string(orientation_[0]).c_str(), RGBPIXEL(0, 128, 255));
+			gfDrawText(n * 70, i * 50 + 15, std::to_string(orientation_[1]).c_str(), RGBPIXEL(0, 128, 255));
+
+
+(ct == EO)
+			? p_in_poligon_eo : (ct == NZW)
+			? p_in_poligon_eo : nullptr;
+
+(ct == EO)
+			? &Poligon<T>::p_in_poligon_eo : (ct == NZW)
+			? &Poligon<T>::p_in_poligon_eo : nullptr;
+---
+
+for (int i = 0; i < 12; i++) {
+			cur = edges3[i];
+			first = &cur->get_start();
+			second = &cur->get_end();
+			new_first = static_cast<Vector4<T>>(*first) * mx;
+			new_second = static_cast<Vector4<T>>(*second) * mx;
+			new_first = new_first.NormalizeHom();
+			new_second = new_second.NormalizeHom();
+			if (i < 4) {
+				n2 = get_z(edges3[i]->get_vector(), edges3[(i + 1) % 4 + 8]->get_vector(), mx);
+				if (i == 3) {
+					n1 = get_z(edges3[4]->get_vector(), edges3[5]->get_vector(), mx);
+				}
+			}
+			else if (i >= 4 && i < 8) {
+				n2 = get_z(edges3[i]->get_vector(), edges3[(i + 1) % 4 + 8]->get_vector(), mx);
+			}
+			/*
+			else if (i == 8) {
+				n1 = get_z(edges3[8]->get_vector(), edges3[3]->get_vector(), mx);
+				n2 = get_z(edges3[8]->get_vector(), (edges3[0]->get_vector()) * (-1.0), mx);
+			}
+			*/
+			/*
+			else if (i == 9) {
+				n1 = get_z(edges3[4]->get_vector(), edges3[5]->get_vector(), mx);
+				n2 = get_z(edges3[4]->get_vector(), edges3[5]->get_vector(), mx);
+			}
+			else if (i == 10) {
+				n1 = get_z(edges3[4]->get_vector(), edges3[5]->get_vector(), mx);
+				n2 = get_z(edges3[4]->get_vector(), edges3[5]->get_vector(), mx);
+			}
+			else if (i == 11) {
+				n1 = get_z(edges3[4]->get_vector(), edges3[5]->get_vector(), mx);
+				n2 = get_z(edges3[4]->get_vector(), edges3[5]->get_vector(), mx);
+			}
+			*/
+			if (n1 > DBL_EPSILON && n2 > DBL_EPSILON) continue;
+			//if (i >= 0 && i <= 9)DrawLine(Edge<T>(static_cast<Point<T>>(new_first), static_cast<Point<T>>(new_second)), color);
+			DrawLine(Edge<T>(static_cast<Point<T>>(new_first), static_cast<Point<T>>(new_second)), color);
+		}
+		
+		
+		 static const RGBPIXEL Black()       { return RGBPIXEL(  0,   0,   0); }
+    static const RGBPIXEL White()       { return RGBPIXEL(255, 255, 255); }
+    static const RGBPIXEL DkGray()      { return RGBPIXEL(128, 128, 128); }
+    static const RGBPIXEL Gray()        { return RGBPIXEL(192, 192, 192); }
+    static const RGBPIXEL DkRed()       { return RGBPIXEL(128,   0,   0); }
+    static const RGBPIXEL Red()         { return RGBPIXEL(255,   0,   0); }
+    static const RGBPIXEL DkGreen()     { return RGBPIXEL(  0, 128,   0); }
+    static const RGBPIXEL Green()       { return RGBPIXEL(  0, 255,   0); }
+    static const RGBPIXEL DkBlue()      { return RGBPIXEL(  0,   0, 128); }
+    static const RGBPIXEL Blue()        { return RGBPIXEL(  0,   0, 255); }
+    static const RGBPIXEL DkYellow()    { return RGBPIXEL(128, 128,   0); }
+    static const RGBPIXEL Yellow()      { return RGBPIXEL(255, 255,   0); }
+    static const RGBPIXEL DkCyan()      { return RGBPIXEL(  0, 128, 128); }
+    static const RGBPIXEL Cyan()        { return RGBPIXEL(  0, 255, 255); }
+    static const RGBPIXEL DkMagenta()   { return RGBPIXEL(128,   0, 128); }
+    static const RGBPIXEL Magenta()     { return RGBPIXEL(255,   0, 255); }

@@ -1,0 +1,1132 @@
+#include "StdAfx.h"
+#include "GF.h"
+
+#ifndef M_PI
+const double M_PI = 3.1415926535897932384626433832795;
+#endif
+const int LEFT = -10;
+const int RIGHT = 10;
+const int BEHIND = 5;
+const int BEYOND = -5;
+const int ORIGIN = 1;
+const int DESTINATION = -1;
+const int BETWEEN = 0;
+const int PARALLEL = 11;
+const int COLINEARE = 101;
+const int SKEW = 42;
+const int CROSSLEFT = 1;
+const int CROSSRIGHT = 2;
+const int INESSENTIAL = 3;
+const int TOUCHING = 4;
+const int CLOCKWISE = 1;
+const int COUNTERCLOCKWISE = -1;
+const int UNDEFINEDCLOCKWISE = 0;
+
+int pol_x_test[10] = { 10, 20, 30, 40, 50, 60, 70, 50, 40, 400 };
+int pol_y_test[10] = { 100, 200, 300, 250, 350, 400, 150, 200, 100, 50 };
+int pol_x_test_1[4] = { 350, 200 , 400, 450 };
+int pol_y_test_1[4] = { 400, 50, 50, 50 };
+int pol_x_test_2[4] = { 350, 400, 450, 460 };
+int pol_y_test_2[4] = { 10, 350, 50, 400 };
+int pol_x_test_3[5] = { 10, 20, 30, 40, 50 };
+int pol_y_test_3[5] = { 10, 40, 20, 50, 10 };
+int pol_x_test_4[5] = { 100, 200, 300, 10, 400 };
+int pol_y_test_4[5] = { 350, 30, 350, 100, 100 };
+
+double xtest8[] = { 250,300,300,250,250,300,300,250 };
+double ytest8[] = { 250,250,250,250,200,200,200,200 };
+double ztest8[] = { 0,0,50,50,0,0,50,50 };
+double xtest9[] = { 300,300,300,300,350,350,350,350 };
+double ytest9[] = { 150,200,300,250,150,200,300,250 };
+double ztest9[] = { 0,50,0,-50,0,50,0,-50 };
+double xtest10[] = { 200,250,250,200,200,250,250,200 };
+double ytest10[] = { 250,250,250,250,200,200,200,200 };
+double ztest10[] = { 200,200,250,250,200,200,250,250 };
+double xtest11[] = { 250, 250, 250, 250, 450, 450, 450, 450 };
+double ytest11[] = { 300, 300, 450, 450, 300, 300, 450, 450 };
+double ztest11[] = { 0, 100, 100, 0, 0, 100, 100, 0 };
+
+
+
+
+/*void DrawLine( int x0, int y0, int x1, int y1, RGBPIXEL color )
+{
+	int dx, dy, E, x, y, a, b, ex, ey, swapIsReal;
+	dx = x1 - x0;
+	dy = y1 - y0;
+	x = x0;
+	y = y0;
+	a = x1;
+	b = y1;
+	ex = (dx > 0) ? 1 : -1;
+	ey = (dy > 0) ? 1 : -1;
+	swapIsReal = 0;
+	gfSetPixel(x, y, color);
+	dx = abs(dx);
+	dy = abs(dy);
+	if (dx < dy)
+	{
+		Swap(dx, dy);
+		Swap(x, y);
+		Swap(a, b);
+		Swap(ex, ey);
+		swapIsReal = 1;
+	}
+	E = 2 * dy - dx;
+	if (dy >= 0)
+	{
+		while ((x != a) || (y != b))
+		{
+			if (E >= 0)
+			{
+				E -= 2 * dx;
+				y += ey;
+			}
+			x += ex;
+			if (swapIsReal) gfSetPixel(y, x, color);
+			else gfSetPixel(x, y, color);
+			E += 2 * dy;
+		}
+	}
+	else
+	{
+		while ((x != a) || (y != b))
+		{
+			if (E > 0)
+			{
+				E -= 2 * dx;
+				y += ey;
+			}
+			x += ex;
+			if (swapIsReal) gfSetPixel(y, x, color);
+			else gfSetPixel(x, y, color);
+			E += 2 * dy;
+		}
+	}
+}*/
+void Drawpix(int x, int y, double norm_x, double norm_y, bool swapIsReal, bool flag, int u, RGBPIXEL color, int &min, int l)
+{
+	int kx, ky;
+	if (u == 0) return;
+	if (u == 1)
+	{
+		if (swapIsReal)
+			gfSetPixel(y, x, color);
+		else
+			gfSetPixel(x, y, color);
+		return;
+	}
+	//if (swapIsReal)
+	//{
+		/*gfSetPixel(y, x, color);
+		if (flag)
+			switch (l)
+			{
+			case 1: if (x - 1 > min)
+			{
+				kx = x - 1;
+				ky = y;
+				gfSetPixel(ky, kx, color);
+			}
+			case 2: if (x - 1 > min)
+			{
+				kx = x + 1;
+				ky = y;
+				gfSetPixel(ky, kx, color);
+			}
+			case 3: if (x - 1 > min)
+			{
+				kx = x;
+				ky = y - 1;
+				gfSetPixel(ky, kx, color);
+			}
+			break;
+			}
+
+		if (u % 2 == 0)
+		{
+			/*gfSetPixel(y + norm_y, x + norm_x, color);
+			for (int i = 1; i < u / 2; ++i)
+			{
+				gfSetPixel(y + norm_y * (i + 1), x + norm_x * (i + 1), color);
+				gfSetPixel(y - norm_y * i, x - norm_x * i, color);
+			}
+		}
+		else
+		{
+			for (int i = 1; i < (u + 1) / 2; ++i)
+			{
+				kx = round(y + norm_y * i);
+				ky = round(x + norm_x * i);
+				gfSetPixel(kx, ky, color);
+				if (flag)
+					switch (l)
+					{
+					case 1: if (round(x + norm_x * i) - 1 > min)
+					{
+						kx = round(y + norm_y * i);
+						ky = round(x + norm_x * i - 1);
+						gfSetPixel(kx, ky, color);
+					}
+					case 2: if (round(x + norm_x * i) - 1 > min)
+					{
+						kx = round(y + norm_y * i + 1);
+						ky = round(x + norm_x * i);
+						gfSetPixel(kx, ky, color);
+					}
+					case 3: if (round(x + norm_x * i) - 1 > min)
+					{
+						kx = round(y + norm_y * i - 1);
+						ky = round(x + norm_x * i);
+						gfSetPixel(kx, ky, color);
+					}
+						break;
+					}
+				kx = round(y - norm_y * i);
+				ky = round(x - norm_x * i);
+				gfSetPixel(kx, ky, color);
+				if (flag)
+					switch (l)
+					{
+					case 1: if (round(x - norm_x * i) - 1 > min)
+					{
+						kx = round(x - norm_x * i - 1);
+						ky = round(y - norm_y * i);
+						gfSetPixel(ky, kx, color);
+					}
+					case 2: if (round(y - norm_y * i) - 1 > min)
+					{
+						kx = round(x - norm_x * i + 1);
+						ky = round(y - norm_y * i);
+						gfSetPixel(ky, kx, color);
+					}
+					case 3: if (round(y - norm_y * i) - 1 > min)
+					{
+						kx = round(x - norm_x * i);
+						ky = round(y - norm_y * i - 1);
+						gfSetPixel(ky, kx, color);
+					}
+						  break;
+					}
+					/*if (round(x - norm_x * i) - 1 > min)
+					{
+						kx = round(y - norm_y * i);
+						ky = round(x - norm_x * i - 1);
+						gfSetPixel(kx, ky, color);
+					}
+				//if (!(flag))
+				//	min = min(round(y + norm_y * i), round(y - norm_y * i));
+			}
+			min = min(round(x + norm_x * (u - 1) / 2), round(x - norm_x * (u - 1) / 2));
+		}
+	}*/
+	//else
+	{
+		if (swapIsReal) gfSetPixel(y, x, color); else
+			gfSetPixel(x, y, color);
+		if (flag)
+			switch (l)
+			{
+			case 1: if (y - 1 > min)
+			{
+				kx = x - 1;
+				ky = y;
+				if (swapIsReal) gfSetPixel(ky, kx, color); else
+					gfSetPixel(kx, ky, color);
+			}
+			case 2: if (y - 1 > min)
+			{
+				kx = x + 1;
+				ky = y;
+				if (swapIsReal) gfSetPixel(ky, kx, color); else
+					gfSetPixel(kx, ky, color);
+			}
+			case 3: if (y - 1 > min)
+			{
+				kx = x;
+				ky = y - 1;
+				if (swapIsReal) gfSetPixel(ky, kx, color); else
+					gfSetPixel(kx, ky, color);
+			}
+					break;
+			}
+		if (u % 2 == 0)
+		{/*
+			gfSetPixel(round(x + norm_x), round(y + norm_y), color);
+			for (int i = 1; i < u / 2; ++i)
+			{
+				gfSetPixel(round(x + norm_x * (i + 1)), round(y + norm_y * (i + 1)), color);
+				gfSetPixel(round(x - norm_x * i), round(y - norm_y * i), color);
+			}*/
+		}
+		else
+		{
+			for (int i = 1; i < (u + 1) / 2; ++i)
+			{
+				kx = round(x + norm_x * i);
+				ky = round(y + norm_y * i);
+				if (swapIsReal) gfSetPixel(ky, kx, color);
+				else gfSetPixel(kx, ky, color);
+				if (flag)
+					switch (l)
+					{
+					case 1: if (round(y + norm_y * i) >= min)
+					{
+						kx = round(x + norm_x * i - 1);
+						ky = round(y + norm_y * i);
+						if (swapIsReal) gfSetPixel(ky, kx, color); else
+							gfSetPixel(kx, ky, color);
+					}
+					case 2: if (round(y + norm_y * i) >= min)
+					{
+						kx = round(x + norm_x * i + 1);
+						ky = round(y + norm_y * i);
+						if (swapIsReal) gfSetPixel(ky, kx, color); else
+							gfSetPixel(kx, ky, color);
+					}
+					case 3: if (round(y + norm_y * i) - 1 > min)
+					{
+						kx = round(x + norm_x * i);
+						ky = round(y + norm_y * i - 1);
+						if (swapIsReal) gfSetPixel(ky, kx, color); else
+							gfSetPixel(kx, ky, color);
+					}
+							break;
+					}
+				kx = round(x - norm_x * i);
+				ky = round(y - norm_y * i);
+				if (swapIsReal) gfSetPixel(ky, kx, color); else
+					gfSetPixel(kx, ky, color);
+				if (flag)
+					switch (l)
+					{
+					case 1: if (round(y - norm_y * i) >= min)
+					{
+						kx = round(x - norm_x * i - 1);
+						ky = round(y - norm_y * i);
+						if (swapIsReal) gfSetPixel(ky, kx, color); else
+							gfSetPixel(kx, ky, color);
+					}
+					case 2: if (round(y - norm_y * i) >= min)
+					{
+						kx = round(x - norm_x * i + 1);
+						ky = round(y - norm_y * i);
+						if (swapIsReal) gfSetPixel(ky, kx, color); else
+							gfSetPixel(kx, ky, color);
+					}
+					case 3: if (round(y - norm_y * i) - 1 > min)
+					{
+						kx = round(x - norm_x * i);
+						ky = round(y - norm_y * i - 1);
+						if (swapIsReal) gfSetPixel(ky, kx, color); else
+							gfSetPixel(kx, ky, color);
+					}
+							break;
+					}
+
+				//if (!(flag))
+				//	min = min(round(y + norm_y * i), round(y - norm_y * i));
+			}
+			min = min(round(y + norm_y * (u - 1) / 2), round(y - norm_y * (u - 1) / 2));
+		}
+	}
+	return;
+}
+void DrawLine(int x0, int y0, int x1, int y1, int u, RGBPIXEL color)
+{
+	bool flag = false;
+	int min = 1000;
+	int l = 0, dx, dy, E, x, y, a, b, ex, ey, swapIsReal;
+	dx = x1 - x0;
+	dy = y1 - y0;
+	if (dx > 0 && dy <= 0) l = 1;
+	if (dx <= 0 && dy < 0) l = 2;
+	if (dx < 0 && dy >= 0) l = 3;
+	if (dx >= 0 && dy > 0) l = 3;
+	x = x0;
+	y = y0;
+	a = x1;
+	b = y1;
+	int nx = y1 - y0;
+	int ny = x0 - x1;
+	double norm_x = nx / ceil(pow((pow(nx, 2) + pow(ny, 2)), 0.5));
+	double norm_y = ny / ceil(pow((pow(nx, 2) + pow(ny, 2)), 0.5));
+	ex = (dx > 0) ? 1 : -1;
+	ey = (dy > 0) ? 1 : -1;
+	swapIsReal = false;
+	//gfSetPixel(x, y, color);
+	dx = abs(dx);
+	dy = abs(dy);
+	if (dx < dy)
+	{
+		Swap(dx, dy);
+		Swap(x, y);
+		Swap(a, b);
+		Swap(ex, ey);
+		Swap(nx, ny);
+		Swap(norm_x, norm_y);
+		swapIsReal = true;
+	}
+	E = 2 * dy - dx;
+	if (dy >= 0)
+	{
+		Drawpix(x, y, norm_x, norm_y, swapIsReal, flag, u, color, min, l);
+		//DrawLine(y, x, y + int(norm_y) * u / 2, x + int(norm_x) * u / 2, 1, RGBPIXEL::Blue());
+		while ((x != a) || (y != b))
+		{
+			flag = false;
+			if (E >= 0)
+			{
+				E -= 2 * dx;
+				y += ey;
+				flag = true;
+			}
+			x += ex;
+			Drawpix(x, y, norm_x, norm_y, swapIsReal, flag, u, color, min, l);
+			E += 2 * dy;
+		}
+	}
+	else
+	{
+		Drawpix(x, y, norm_x, norm_y, swapIsReal, flag, u, color, min, l);
+		while ((x != a) || (y != b))
+		{
+			flag = false;
+			if (E > 0)
+			{
+				E -= 2 * dx;
+				y += ey;
+				flag = true;
+			}
+			x += ex;
+			Drawpix(x, y, norm_x, norm_y, swapIsReal, flag, u, color, min, l);
+			E += 2 * dy;
+		}
+	}
+}
+void DrawThePolygon(int* x, int* y, int n, int u, RGBPIXEL color)
+{
+	for (int i = 0; i < n; i++)
+	{
+		DrawLine(x[i], y[i], x[(i + 1) % n], y[(i + 1) % n], u, color);
+	}
+}
+/*int* Drawar(int* x, int* y, int n)
+{
+	int x_new[10];
+	int a_max = -1000;
+	for (int i = 0; i < 5; i++)
+	{
+		if (x[i] > a_max)
+			a_max = x[i];
+	}
+	int a_min = 10000;
+	for (int i = 0; i < 5; i++)
+	{
+		if (x[i] < a_min)
+			a_max = x[i];
+	}
+	double x_av = (a_max + a_min) / 2;
+	for (int i = 0; i < n; i++)
+	{
+		if (x[i] < x_av)
+			x[i] = x[i] + 2 * abs((x_av - x[i]));
+		if (x[i] > x_av)
+			x[i] = x[i] - 2 * abs((x_av - x[i]));
+	}
+	return x_new;
+}*/
+int Classify(double x1, double y1, double x2, double y2, double x, double y)
+{
+	double ax, ay, bx, by, s;
+	ax = x2 - x1;
+	ay = y2 - y1;
+	bx = x - x1;
+	by = y - y1;
+	s = ax * by - bx * ay;
+	if (s > 0) return LEFT;
+	if (s < 0) return RIGHT;
+	if ((ax * bx < 0) || (ay * by < 0)) return BEHIND;
+	if ((ax * ax + ay * ay) < (bx * bx + by * by)) return BEYOND;
+	if ((x == x1) && (y == y1)) return ORIGIN;
+	if ((x == x2) && (y == y2)) return DESTINATION;
+	return BETWEEN;
+}
+int Intersect(int xa, int ya, int xb, int yb, int xc, int yc, int xd, int yd, double& t)
+{
+	int nx = yd - yc;
+	int ny = xc - xd;
+	int denom = nx * (xb - xa) + ny * (yb - ya);
+	if (denom == 0)
+	{
+		int type = Classify(xc, yc, xd, yd, xa, ya);
+		if ((type == LEFT) || (type == RIGHT)) return PARALLEL;
+		else return COLINEARE;
+	}
+	int num = nx * (xa - xc) + ny * (ya - yc);
+	t = -(1.0) * num / denom;
+	return SKEW;
+}
+int EdgeType(int xa, int ya, int xo, int yo, int xd, int yd)
+{
+	switch (Classify(xo, yo, xd, yd, xa, ya))
+	{
+	case(LEFT):
+		if ((ya > yo) && (ya <= yd)) return CROSSLEFT;
+		else return INESSENTIAL;
+	case(RIGHT):
+		if ((ya > yd) && (ya <= yo)) return CROSSRIGHT;
+		else return INESSENTIAL;
+	case(BETWEEN):return TOUCHING;
+	case(ORIGIN):return TOUCHING;
+	case(DESTINATION):return TOUCHING;
+	default:return INESSENTIAL;
+	}
+}
+bool InPolygonEO(int x, int y, int* px, int* py, int n)
+{
+	int EO = 0;
+	for (int i = 0; i < n; ++i) {
+		switch (EdgeType(x, y, px[i], py[i], px[(i + 1) % n], py[(i + 1) % n]))
+		{
+		case(TOUCHING):return true;
+		case(CROSSLEFT):
+			++EO;
+			break;
+		case(CROSSRIGHT):
+			++EO;
+			break;
+		}
+	}
+	if (EO & 1)return true;
+	return(false);
+}
+bool InPolygonNZ(int x, int y, int* px, int* py, int n)
+{
+	int WN = 0;
+	for (int i = 0; i < n; ++i) {
+		switch (EdgeType(x, y, px[i], py[i], px[(i + 1) % n], py[(i + 1) % n]))
+		{
+		case(TOUCHING):return true;
+		case(CROSSLEFT):
+			++WN;
+			break;
+		case(CROSSRIGHT):
+			--WN;
+			break;
+		}
+	}
+	if (WN != 0)return true;
+	return(false);
+}
+void FillPolygonEO(int* x, int* y, int n, int u, RGBPIXEL color) {
+	DrawThePolygon(x, y, n, u, color);
+	if (n >= 3) {
+		int xmax = x[0];
+		int xmin = x[0];
+		int ymax = y[0];
+		int ymin = y[0];
+		for (int i = 1; i < n; ++i) {
+			if (x[i] > xmax) xmax = x[i];
+			if (x[i] < xmin) xmin = x[i];
+			if (y[i] > ymax) ymax = y[i];
+			if (y[i] < ymin) ymin = y[i];
+		}
+		for (int ax = xmin; ax <= xmax; ++ax) {
+			for (int ay = ymin; ay <= ymax; ++ay) {
+				if (InPolygonEO(ax, ay, x, y, n))gfSetPixel(ax, ay, color);
+			}
+		}
+	}
+}
+
+void FillPolygonNZ(int* x, int* y, int n, int u, RGBPIXEL color) {
+	DrawThePolygon(x, y, n, u, color);
+	if (n >= 3) {
+		int xmax = x[0];
+		int xmin = x[0];
+		int ymax = y[0];
+		int ymin = y[0];
+		for (int i = 1; i < n; ++i) {
+			if (x[i] > xmax) xmax = x[i];
+			if (x[i] < xmin) xmin = x[i];
+			if (y[i] > ymax) ymax = y[i];
+			if (y[i] < ymin) ymin = y[i];
+		}
+		for (int ax = xmin; ax <= xmax; ++ax) {
+			for (int ay = ymin; ay <= ymax; ++ay) {
+				if (InPolygonNZ(ax, ay, x, y, n))gfSetPixel(ax, ay, color);
+			}
+		}
+	}
+}
+
+bool IsConvex(int* x, int* y, int n) {
+	if (n == 0 || n == 1) {
+		return true;
+	}
+	if (n == 2) {
+		return false;
+	}
+	int state = 15;
+	int stateprev;
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			if (j != i && j != (i + 1) % n) {
+				stateprev = state;
+				state = Classify(x[i], y[i], x[(i + 1) % n], y[(i + 1) % n], x[j], y[j]);
+				if ((state == BEYOND) || (state == BEHIND)) continue;
+				if (!((state == LEFT) || (state == RIGHT)) || ((stateprev != 15) && ((state != stateprev) && (stateprev != BEYOND) && (stateprev != BEHIND)))) {
+					return false;
+				}
+			}
+		}
+		state = 15;
+	}
+	return true;
+}
+
+bool HasSelfCrosses(int* x, int* y, int n) {
+	if (n == 3)return false;
+	double t;
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			if ((i != j) && ((i + 1) % n != j) && (i != (j + 1) % n)) {
+				int tmp = Intersect(x[i], y[i], x[(i + 1) % n], y[(i + 1) % n], x[j], y[j], x[(j + 1) % n], y[(j + 1) % n], t);
+				if (tmp == SKEW) {
+					if ((t >= 0) && (t <= 1)) {
+						Intersect(x[j], y[j], x[(j + 1) % n], y[(j + 1) % n], x[i], y[i], x[(i + 1) % n], y[(i + 1) % n], t);
+						if ((t >= 0) && (t <= 1))return true;
+					}
+				}
+				else if (tmp == COLINEARE)return true;
+			}
+		}
+	}
+	return false;
+}
+
+void AnalysePolygon(int* x, int* y, int n) {
+	if (n >= 0) {
+		if (IsConvex(x, y, n)) gfDrawText(x[0], y[0], "Convex", RGBPIXEL::White());
+		if (!(IsConvex(x, y, n))) gfDrawText(x[0], y[0], "Concave", RGBPIXEL::White());
+		if (HasSelfCrosses(x, y, n)) gfDrawText(x[1], y[3], "With self crosses", RGBPIXEL::White());
+		if (!(HasSelfCrosses(x, y, n))) gfDrawText(x[1], y[3], "With self crosses", RGBPIXEL::White());
+	}
+}
+int curveBezier(int x0, int x1, int x2, int x3, double t) {
+	return round((1.0 - t) * (1.0 - t) * (1.0 - t) * (x0 * 1.0) +
+		3 * (1.0 - t) * (1.0 - t) * (t) * (x1 * 1.0) +
+		3 * (t) * (t) * (1.0 - t) * (x2 * 1.0) +
+		(t) * (t) * (t) * (x3 * 1.0));
+}
+
+void DrawCurve(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, RGBPIXEL color) {
+	int Dist1 = abs(x0 - 2 * x1 + x2) + abs(y0 - 2 * y1 + y2);
+	int Dist2 = abs(x1 - 2 * x2 + x3) + abs(y1 - 2 * y2 + y3);
+	int D = (Dist1 >= Dist2) ? Dist1 : Dist2;
+	int n = 1 + ceil(sqrt(D * 3.0));
+	double len = 1.0 / n;
+	int xstart = x0;
+	int ystart = y0;
+	int xfinish, yfinish;
+
+	double t = 0.0;
+	for (int i = 0; i <= n; ++i) {
+		xfinish = curveBezier(x0, x1, x2, x3, t);
+		yfinish = curveBezier(y0, y1, y2, y3, t);
+		DrawLine(xstart, ystart, xfinish, yfinish, 1, color);
+		xstart = xfinish;
+		ystart = yfinish;
+		t += len;
+	}
+}
+
+int ClipLine(int& xa, int& ya, int& xb, int& yb, int* px, int* py, int n) {
+	double t, t0 = 0.0, t1 = 1.0;
+	int sx = xb - xa;
+	int sy = yb - ya;
+	int nx, ny, denom, num;
+	if (n <= 2)
+		return 1;
+	if (!IsConvex(px, py, n))
+		return 1;
+	int step;
+	if (Classify(px[0], py[0], px[1], py[1], px[2], py[2]) == RIGHT)
+		step = 1;
+	else step = -1;
+	int j = n + 1;
+	for (int i = 0; i < n; ++i) {
+		nx = py[(j + step) % n] - py[j % n];
+		ny = px[j % n] - px[(j + step) % n];
+		denom = nx * sx + ny * sy;
+		num = nx * (xa - px[j % n]) + ny * (ya - py[j % n]);
+		if (abs(denom) > DBL_EPSILON) {
+			t = (-1.0) * num / denom;
+			if (denom > 0) {
+				if (t > t0) t0 = t;
+			}
+			else {
+				if (t < t1) t1 = t;
+			}
+		}
+		else {
+			if (num < 0) return 1;
+		}
+		j += step;
+	}
+	if (t0 <= t1) {
+		int xat = xa, yat = ya, xbt = xb, ybt = yb;
+		xa = round(xat * 1.0 + t0 * (xbt * 1.0 - xat * 1.0));
+		ya = round(yat * 1.0 + t0 * (ybt * 1.0 - yat * 1.0));
+		xb = round(xat * 1.0 + t1 * (xbt * 1.0 - xat * 1.0));
+		yb = round(yat * 1.0 + t1 * (ybt * 1.0 - yat * 1.0));
+		return 0;
+	}
+	return 1;
+}
+
+void DrawClipped(int xa, int ya, int xb, int yb, int* px, int* py, int n) {
+	DrawLine(xa, ya, xb, yb, 1, RGBPIXEL::White());
+	DrawThePolygon(px, py, n, 1, RGBPIXEL::Red());
+	if (ClipLine(xa, ya, xb, yb, px, py, n) == 0)
+		DrawLine(xa, ya, xb, yb, 1, RGBPIXEL::Green());
+}
+
+class matrix {
+	//РљР»Р°СЃСЃ РјР°С‚СЂРёС† СЂР°Р·РјРµСЂР° 4С…4 РґР»СЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РєРѕРѕСЂРґРёРЅР°С‚
+public:
+	double** m;
+	matrix()
+	{
+		m = new double*[4];
+		for (int i = 0; i < 4; ++i) {
+			m[i] = new double[4];
+			for (int j = 0; j < 4; ++j) {
+				m[i][j] = 0.0;
+			}
+		}
+	}
+	matrix(int n)
+	{
+		/*Р”Р°РЅРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РІС‹РґР°РµС‚ РјР°С‚СЂРёС†Сѓ РІРёРґР°:
+		1 0 0 0
+		0 1 0 0
+		0 0 0 0
+		0 0 n 1
+		РєРѕС‚РѕСЂР°СЏ Р·Р°РґР°РµС‚ РїР°СЂР°Р»Р»РµР»СЊРЅСѓСЋ РїСЂРѕРµРєС†РёСЋ РЅР° РїР»РѕСЃРєРѕСЃС‚СЊ z = n*/
+		m = new double*[4];
+		for (int i = 0; i < 4; ++i) {
+			m[i] = new double[4];
+			for (int j = 0; j < 4; ++j) {
+				m[i][j] = 0.0;
+			}
+		}
+		m[3][2] = n;
+		m[0][0] = 1;
+		m[1][1] = 1;
+		m[3][3] = 1;
+	}
+	matrix(int t, int n)
+	{
+		/*Р”Р°РЅРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РІС‹РґР°РµС‚ РјР°С‚СЂРёС†Сѓ РІРёРґР°:
+		1 0 0 0
+		0 1 0 0
+		0 0 0 1/n
+		0 0 n 1
+		РєРѕС‚РѕСЂР°СЏ Р·Р°РґР°РµС‚ РѕРґРЅРѕС‚РѕС‡РµС‡РЅСѓСЋ РїРµСЂСЃРїРµРєС‚РёРІРЅСѓСЋ РїСЂРѕРµРєС†РёСЋ СЃ С†РµРЅС‚СЂРѕРј РїСЂРѕРµРєС†РёР№ (0, 0, n)*/
+		m = new double*[4];
+		for (int i = 0; i < 4; ++i) {
+			m[i] = new double[4];
+			for (int j = 0; j < 4; ++j) {
+				m[i][j] = 0.0;
+			}
+		}
+		m[2][3] = -1.0 / n;
+		m[3][2] = 0;
+		m[0][0] = 1;
+		m[1][1] = 1;
+		m[3][3] = 1;
+	}
+
+	matrix(double x, double y, double z, double fi)
+	{
+		/*РјР°С‚СЂРёС†Р° Р РѕРґСЂРёРіРµСЃСЃР°. Р—Р°РґР°РµС‚ РїРѕРІРѕСЂРѕС‚ РЅР° СѓРіРѕР» fi РїСЂРѕС‚РёРІ С‡Р°СЃРѕРІРѕР№ СЃС‚СЂРµР»РєРё РІРѕРєСЂСѓРі РѕСЃРё (x, y, z)*/
+		m = new double*[4];
+		for (int i = 0; i < 4; ++i) {
+			m[i] = new double[4];
+		}
+		double r = sqrt(x * x + y * y + z * z);
+		double nx = x / r;
+		double ny = y / r;
+		double nz = z / r;
+		m[0][0] = cos(fi) + nx * nx * (1 - cos(fi));
+		m[0][1] = nz * sin(fi) + nx * ny * (1 - cos(fi));
+		m[0][2] = -ny * sin(fi) + nx * nz * (1 - cos(fi));
+		m[0][3] = 0;
+		m[1][0] = nx * ny * (1 - cos(fi)) - nz * sin(fi);
+		m[1][1] = cos(fi) + ny * ny * (1 - cos(fi));
+		m[1][2] = nx * sin(fi) + ny * nz * (1 - cos(fi));
+		m[1][3] = 0;
+		m[2][0] = ny * sin(fi) + nx * nz * (1 - cos(fi));
+		m[2][1] = -nx * sin(fi) + ny * nz * (1 - cos(fi));
+		m[2][2] = cos(fi) + nz * nz * (1 - cos(fi));
+		m[2][3] = 0;
+		m[3][0] = 0;
+		m[3][1] = 0;
+		m[3][2] = 0;
+		m[3][3] = 1;
+	}
+
+	~matrix() {
+		for (int i = 0; i < 4; ++i) {
+			delete[] m[i];
+		}
+		delete[] m;
+	}
+	matrix mul(matrix a) {
+		matrix res;
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				for (int k = 0; k < 4; ++k) {
+					res.m[i][j] += this->m[i][k] * a.m[k][j];
+				}
+			}
+		}
+		return res;
+	}
+};
+
+class point {
+public:
+	double x, y, z, h;
+	point() {
+		x = 0;
+		y = 0;
+		z = 0;
+		h = 1;
+	}
+	point(double mx, double my, double mz) {
+		x = mx;
+		y = my;
+		z = mz;
+		h = 1;
+	}
+	void norm()
+	{
+		x /= h;
+		y /= h;
+		z /= h;
+		h = 1;
+	}
+	point mulMatr(matrix* a)
+	{
+		point res;
+		res.x = x * a->m[0][0] + y * a->m[1][0] + z * a->m[2][0] + h * a->m[3][0];
+		res.y = x * a->m[0][1] + y * a->m[1][1] + z * a->m[2][1] + h * a->m[3][1];
+		res.z = x * a->m[0][2] + y * a->m[1][2] + z * a->m[2][2] + h * a->m[3][2];
+		res.h = x * a->m[0][3] + y * a->m[1][3] + z * a->m[2][3] + h * a->m[3][3];
+		return res;
+	}
+};
+
+class parallelogram {
+public:
+	double* xv;
+	double* yv;
+	double* zv;
+	double** pol;
+	parallelogram(double* x, double* y, double* z) {
+		xv = x;
+		yv = y;
+		zv = z;
+	}
+
+	void DrawParal(int n) {
+		double n1;
+		double n2;
+		matrix* T = new matrix(n);
+		point points[8];
+		for (int i = 0; i < 8; ++i) {
+			points[i].h = 1;
+			points[i].x = xv[i];
+			points[i].y = yv[i];
+			points[i].z = zv[i];
+			points[i] = points[i].mulMatr(T);
+			points[i].norm();
+		}
+		for (int i = 0; i < 4; ++i) {
+			DrawLine(round(points[i].x), round(points[i].y), round(points[(i + 1) % 4].x), round(points[(i + 1) % 4].y), 1, RGBPIXEL::White());
+		}
+		for (int i = 0; i < 4; ++i) {
+			DrawLine(round(points[i + 4].x), round(points[i + 4].y), round(points[((i + 1) % 4) + 4].x), round(points[((i + 1) % 4) + 4].y), 1, RGBPIXEL::White());
+		}
+		for (int i = 0; i < 4; ++i) {
+			DrawLine(round(points[i].x), round(points[i].y), round(points[i + 4].x), round(points[i + 4].y), 1, RGBPIXEL::White());
+		}
+		delete T;
+	}
+	void DrawWithPersp(int n) {
+		double n1, n2, n11;
+		matrix* T = new matrix(0, n);
+		point points[8];
+		for (int i = 0; i < 8; ++i) {
+			points[i].h = 1;
+			points[i].x = xv[i];
+			points[i].y = yv[i];
+			points[i].z = zv[i];
+			points[i] = points[i].mulMatr(T);
+			points[i].norm();
+		}
+		n1 = (round(points[1].x) - round(points[0].x)) * (round(points[2].y) - round(points[0].y)) - (round(points[1].y) - round(points[0].y)) * (round(points[2].x) - round(points[0].x));
+		for (int i = 0; i < 4; ++i) {
+			//n1 = (round(points[(i + 1) % 4].x) - round(points[i].x)) * (round(points[(i + 2) % 4].y) - round(points[i].y)) - (round(points[(i + 1) % 4].y) - round(points[i].y)) * (round(points[(i + 2) % 4].x) - round(points[i].x));
+			n2 = (round(points[i].x) - round(points[(i + 1) % 4].x)) * (round(points[i + 4].y) - round(points[(i + 1) % 4].y)) - (round(points[i].y) - round(points[(i + 1) % 4].y)) * (round(points[i + 4].x) - round(points[(i + 1) % 4].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[i].x), round(points[i].y), round(points[(i + 1) % 4].x), round(points[(i + 1) % 4].y), 1, RGBPIXEL::White());
+		}
+		n1 = (round(points[4].x) - round(points[5].x)) * (round(points[7].y) - round(points[5].y)) - (round(points[4].y) - round(points[5].y)) * (round(points[7].x) - round(points[5].x));
+		for (int i = 0; i < 4; ++i) {
+			//n1 = (round(points[i + 4].x) - round(points[((i + 1) % 4) + 4].x)) * (round(points[((i + 3) % 4) + 4].y) - round(points[((i + 1) % 4) + 4].y)) - (round(points[i + 4].y) - round(points[((i + 1) % 4) + 4].y)) * (round(points[((i + 3) % 4) + 4].x) - round(points[((i + 1) % 4) + 4].x));
+			n2 = (round(points[((i + 1) % 4) + 4].x) - round(points[i + 4].x)) * (round(points[i].y) - round(points[i + 4].y)) - (round(points[((i + 1) % 4) + 4].y) - round(points[i + 4].y)) * (round(points[i].x) - round(points[i + 4].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[((i + 1) % 4) + 4].x), round(points[((i + 1) % 4) + 4].y), round(points[i + 4].x), round(points[i + 4].y), 1, RGBPIXEL::Red());
+		}
+		n11 = (round(points[0].x) - round(points[4].x)) * (round(points[3].y) - round(points[4].y)) - (round(points[0].y) - round(points[4].y)) * (round(points[3].x) - round(points[4].x));
+		n1 = n11;
+		for (int i = 0; i < 4; ++i) {
+			if (i > 0)  n1 = n2;
+			if (i == 3) n2 = n11;
+			else n2 = (round(points[i + 4].x) - round(points[i].x)) * (round(points[i + 5].y) - round(points[i].y)) - (round(points[i + 4].y) - round(points[i].y)) * (round(points[i + 5].x) - round(points[i].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[i].x), round(points[i].y), round(points[i + 4].x), round(points[i + 4].y), 1, RGBPIXEL::Green());
+		}
+		delete T;
+	}
+
+	void DrawParalAndRot(int n, double a, double b, double c, double fi) {
+		double n1, n2, n11;
+		matrix* T = new matrix(n);
+		matrix* R = new matrix(a, b, c, fi * M_PI / 180);
+		point points[8];
+		for (int i = 0; i < 8; ++i) {
+			points[i].h = 1;
+			points[i].x = xv[i];
+			points[i].y = yv[i];
+			points[i].z = zv[i];
+			points[i] = points[i].mulMatr(R);
+			points[i] = points[i].mulMatr(T);
+			points[i].norm();
+		}
+		n1 = (round(points[1].x) - round(points[0].x)) * (round(points[2].y) - round(points[0].y)) - (round(points[1].y) - round(points[0].y)) * (round(points[2].x) - round(points[0].x));
+		for (int i = 0; i < 4; ++i) {
+			//n1 = (round(points[(i + 1) % 4].x) - round(points[i].x)) * (round(points[(i + 2) % 4].y) - round(points[i].y)) - (round(points[(i + 1) % 4].y) - round(points[i].y)) * (round(points[(i + 2) % 4].x) - round(points[i].x));
+			n2 = (round(points[i].x) - round(points[(i + 1) % 4].x)) * (round(points[i + 4].y) - round(points[(i + 1) % 4].y)) - (round(points[i].y) - round(points[(i + 1) % 4].y)) * (round(points[i + 4].x) - round(points[(i + 1) % 4].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[i].x), round(points[i].y), round(points[(i + 1) % 4].x), round(points[(i + 1) % 4].y), 1, RGBPIXEL::White());
+		}
+		n1 = (round(points[4].x) - round(points[5].x)) * (round(points[7].y) - round(points[5].y)) - (round(points[4].y) - round(points[5].y)) * (round(points[7].x) - round(points[5].x));
+		for (int i = 0; i < 4; ++i) {
+			//n1 = (round(points[i + 4].x) - round(points[((i + 1) % 4) + 4].x)) * (round(points[((i + 3) % 4) + 4].y) - round(points[((i + 1) % 4) + 4].y)) - (round(points[i + 4].y) - round(points[((i + 1) % 4) + 4].y)) * (round(points[((i + 3) % 4) + 4].x) - round(points[((i + 1) % 4) + 4].x));
+			n2 = (round(points[((i + 1) % 4) + 4].x) - round(points[i + 4].x)) * (round(points[i].y) - round(points[i + 4].y)) - (round(points[((i + 1) % 4) + 4].y) - round(points[i + 4].y)) * (round(points[i].x) - round(points[i + 4].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[((i + 1) % 4) + 4].x), round(points[((i + 1) % 4) + 4].y), round(points[i + 4].x), round(points[i + 4].y), 1, RGBPIXEL::Red());
+		}
+		n11 = (round(points[0].x) - round(points[4].x)) * (round(points[3].y) - round(points[4].y)) - (round(points[0].y) - round(points[4].y)) * (round(points[3].x) - round(points[4].x));
+		n1 = n11;
+		for (int i = 0; i < 4; ++i) {
+			if (i > 0)  n1 = n2;
+			if (i == 3) n2 = n11;
+			else n2 = (round(points[i + 4].x) - round(points[i].x)) * (round(points[i + 5].y) - round(points[i].y)) - (round(points[i + 4].y) - round(points[i].y)) * (round(points[i + 5].x) - round(points[i].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[i].x), round(points[i].y), round(points[i + 4].x), round(points[i + 4].y), 1, RGBPIXEL::Green());
+		}
+		delete T;
+		delete R;
+	}
+	void DrawWithPerspAndRot(int n, double a, double b, double c, double fi) {
+		double n1, n2, n11;
+		matrix* T = new matrix(0, n);
+		matrix* R = new matrix(a, b, c, fi * M_PI / 180);
+		point points[8];
+		for (int i = 0; i < 8; ++i) {
+			points[i].h = 1;
+			points[i].x = xv[i];
+			points[i].y = yv[i];
+			points[i].z = zv[i];
+			points[i] = points[i].mulMatr(R);
+			points[i] = points[i].mulMatr(T);
+			points[i].norm();
+		}
+		n1 = (round(points[1].x) - round(points[0].x)) * (round(points[2].y) - round(points[0].y)) - (round(points[1].y) - round(points[0].y)) * (round(points[2].x) - round(points[0].x));
+		for (int i = 0; i < 4; ++i) {
+			//n1 = (round(points[(i + 1) % 4].x) - round(points[i].x)) * (round(points[(i + 2) % 4].y) - round(points[i].y)) - (round(points[(i + 1) % 4].y) - round(points[i].y)) * (round(points[(i + 2) % 4].x) - round(points[i].x));
+			n2 = (round(points[i].x) - round(points[(i + 1) % 4].x)) * (round(points[i + 4].y) - round(points[(i + 1) % 4].y)) - (round(points[i].y) - round(points[(i + 1) % 4].y)) * (round(points[i + 4].x) - round(points[(i + 1) % 4].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[i].x), round(points[i].y), round(points[(i + 1) % 4].x), round(points[(i + 1) % 4].y), 1, RGBPIXEL::White());
+		}
+		n1 = (round(points[4].x) - round(points[5].x)) * (round(points[7].y) - round(points[5].y)) - (round(points[4].y) - round(points[5].y)) * (round(points[7].x) - round(points[5].x));
+		for (int i = 0; i < 4; ++i) {
+			//n1 = (round(points[i + 4].x) - round(points[((i + 1) % 4) + 4].x)) * (round(points[((i + 3) % 4) + 4].y) - round(points[((i + 1) % 4) + 4].y)) - (round(points[i + 4].y) - round(points[((i + 1) % 4) + 4].y)) * (round(points[((i + 3) % 4) + 4].x) - round(points[((i + 1) % 4) + 4].x));
+			n2 = (round(points[((i + 1) % 4) + 4].x) - round(points[i + 4].x)) * (round(points[i].y) - round(points[i + 4].y)) - (round(points[((i + 1) % 4) + 4].y) - round(points[i + 4].y)) * (round(points[i].x) - round(points[i + 4].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[((i + 1) % 4) + 4].x), round(points[((i + 1) % 4) + 4].y), round(points[i + 4].x), round(points[i + 4].y), 1, RGBPIXEL::Red());
+		}
+		n11 = (round(points[0].x) - round(points[4].x)) * (round(points[3].y) - round(points[4].y)) - (round(points[0].y) - round(points[4].y)) * (round(points[3].x) - round(points[4].x));
+		n1 = n11;
+		for (int i = 0; i < 4; ++i) {
+			if (i > 0)  n1 = n2;
+			if (i == 3) n2 = n11;
+			else n2 = (round(points[i + 4].x) - round(points[i].x)) * (round(points[i + 5].y) - round(points[i].y)) - (round(points[i + 4].y) - round(points[i].y)) * (round(points[i + 5].x) - round(points[i].x));
+			if ((n1 < DBL_EPSILON) && (n2 < DBL_EPSILON)) continue;
+			DrawLine(round(points[i].x), round(points[i].y), round(points[i + 4].x), round(points[i + 4].y), 1, RGBPIXEL::Green());
+		}
+		delete T;
+		delete R;
+	}
+};
+
+parallelogram testPar = parallelogram(xtest9, ytest9, ztest9);
+parallelogram testPar1 = parallelogram(xtest10, ytest10, ztest10);
+parallelogram testPar2 = parallelogram(xtest11, ytest11, ztest11);
+
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· РІ СЃР°РјРѕРј РЅР°С‡Р°Р»Рµ РїСЂРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
+bool gfInitScene()
+{
+	gfSetWindowSize(640, 480);
+
+	//gfSetPixel( 20, 20, RGBPIXEL(255, 255, 0) );
+
+	//gfDrawRectangle( 100, 120, 170, 150, RGBPIXEL(255, 255, 0) );
+
+	//gfDrawText( 200, 200, "Hello World", RGBPIXEL(0, 128, 255));
+
+
+	/*DrawLine(350, 350, 100, 10, 5, RGBPIXEL::White());
+	DrawLine(350, 350, 10, 200, 5, RGBPIXEL::Green());
+	DrawLine(350, 350, 450, 10, 3, RGBPIXEL::White());
+	DrawLine(350, 350, 250, 450, 5,  RGBPIXEL::Green());
+	DrawLine(350, 350, 500, 30, 5, RGBPIXEL::White());
+	DrawLine(350, 350, 500, 450, 5, RGBPIXEL::White());
+	DrawLine(350, 350, 400, 450, 5, RGBPIXEL::Yellow());
+	DrawLine(350, 350, 10, 450, 5, RGBPIXEL::Blue());
+	DrawLine(350, 350, 500, 260, 5, RGBPIXEL::Blue());
+	DrawLine(350, 350, 350, 450, 5, RGBPIXEL::Blue());
+	DrawLine(10, 350, 500, 350, 5, RGBPIXEL::Blue());*/
+	/*gfSetPixel(100.4, 150.4, RGBPIXEL::White());
+	gfSetPixel(100, 150, RGBPIXEL::Green());
+	gfSetPixel(100.5, 150.5, RGBPIXEL::White());
+	gfSetPixel(100.6, 150.6, RGBPIXEL::Green());
+	gfSetPixel(100.7, 150.7, RGBPIXEL::White());
+	gfSetPixel(100.8, 150.8, RGBPIXEL::Green());
+	gfSetPixel(100.9, 150.9, RGBPIXEL::Red());
+	gfSetPixel(101, 151, RGBPIXEL::White());
+	gfSetPixel(101.1, 151.1, RGBPIXEL::Red());
+	*/
+	//Drawpix(100, 100, false, 10, RGBPIXEL::Red());
+		/*DrawLine(50, 50, 500, 310, RGBPIXEL::Green());
+	DrawLine(65, 60, 500, 320, RGBPIXEL::Green());
+	DrawLine(112, 150, 500, 400, RGBPIXEL::Green());
+	DrawLine(10, 10, 500, 420, RGBPIXEL::Green());
+	DrawLine(322, 10, 322, 510, RGBPIXEL::Red());
+	DrawLine(10, 20, 510, 20, RGBPIXEL::Red());
+	DrawLine(510, 20, 10, 20, RGBPIXEL::Red());
+	DrawLine(600, 10, 20, 450, RGBPIXEL::Yellow());
+	//gfDisplayMessage("Message!");
+	DrawLine(300, 300, 10, 10, RGBPIXEL::White());
+	DrawLine(300, 300, 400, 10, RGBPIXEL::White());
+	DrawLine(300, 300, 300, 50, RGBPIXEL::White());
+	DrawLine(300, 300, 10, 450, RGBPIXEL::White());
+	DrawLine(300, 300, 400, 450, RGBPIXEL::White());
+	DrawLine(300, 300, 250, 550, RGBPIXEL::White());
+	DrawLine(300, 300, 40, 450, RGBPIXEL::White());
+	DrawLine(300, 300, 500, 450, RGBPIXEL::White());
+	DrawLine(300, 300, 500, 150, RGBPIXEL::White());
+	DrawLine(300, 300, 20, 200, RGBPIXEL::White());
+	*/
+	//DrawThePolygon(pol_x_test_1, pol_y_test_1, 4, 5, RGBPIXEL::Cyan());
+	//FillPolygonEO(pol_x_test_1, pol_y_test_1, 4, 5, RGBPIXEL::Red());
+	//AnalysePolygon(pol_x_test_1, pol_y_test_1, 4);
+
+	//DrawThePolygon(pol_x_test_2, pol_y_test_2, 4, RGBPIXEL::Cyan());
+	//FillPolygonEO(pol_x_test_2, pol_y_test_2, 4, RGBPIXEL::Blue());
+	//AnalysePolygon(pol_x_test_2, pol_y_test_2, 4);
+	//DrawThePolygon(pol_x_test_3, pol_y_test_3, 5, RGBPIXEL::Cyan());
+	//FillPolygonEO(pol_x_test_3, pol_y_test_3, 5, RGBPIXEL::Green());
+	/*/AnalysePolygon(pol_x_test_3, pol_y_test_3, 5);
+	/DrawThePolygon(pol_x_test_4, pol_y_test_4, 5, RGBPIXEL::Cyan());
+	FillPolygonNZ(pol_x_test_4, pol_y_test_4, 5, RGBPIXEL::Yellow());
+	//FillPolygonEO(pol_x_test_4, pol_y_test_4, 5, RGBPIXEL::Yellow());
+	AnalysePolygon(pol_x_test_4, pol_y_test_4, 5);
+	*/
+	//DrawCurve(100, 30, 200, 350, 300, 50, 400, 400, RGBPIXEL::Yellow());
+	//DrawCurve(50, 50, 100, 100, 200, 50, 400, 250, RGBPIXEL::Green());
+	//DrawClipped(10, 100, 250, 100, pol_x_test_1, pol_y_test_1, 4);
+	//DrawClipped(200, 100, 500, 100, pol_x_test_1, pol_y_test_1, 4);
+	//testPar1.DrawWithPersp(500);
+	//testPar2.DrawWithPersp(100);
+	//testPar2.DrawParal(500);
+	//testPar2.DrawParalAndRot(500, 250, 300, 0, 70);
+	//testPar2.DrawWithPerspAndRot(200, 250., 300., 0., 70.);
+
+	return true;
+}
+
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РІ С†РёРєР»Рµ РґРѕ РјРѕРјРµРЅС‚Р° РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ.
+// РЎР»РµРґСѓРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Р°РЅРёРјР°С†РёРѕРЅРЅС‹С… СЌС„С„РµРєС‚РѕРІ
+void gfDrawScene()
+{
+	gfClearScreen(RGBPIXEL::Black());
+
+	//static int x = 0;
+	//gfDrawRectangle(x, 100, x + 50, 130, RGBPIXEL::Blue());
+	//x = (x + 1) % gfGetWindowWidth() ;
+
+	//int x = gfGetMouseX(),
+	//    y = gfGetMouseY();
+	//gfDrawRectangle(x - 10, y - 10, x + 10, y + 10, RGBPIXEL::Green());
+	//gfClearScreen(RGBPIXEL::Black());
+
+	static int x = 0;
+	//testPar2.DrawWithPerspAndRot(150, 1, 1, 1, x);
+	testPar.DrawWithPerspAndRot(1000, 275, 225, 25, x);
+	x = (x + 1) % 360;
+}
+
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· РїРµСЂРµРґ РІС‹С…РѕРґРѕРј РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ.
+// РЎР»РµРґСѓРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґР»СЏ РѕСЃРІРѕР±РѕР¶РґРµРЅРёСЏ РІС‹РґРµР»РµРЅРЅС‹С…
+// СЂРµСЃСѓСЂСЃРѕРІ (РїР°РјСЏС‚Рё, С„Р°Р№Р»РѕРІ Рё С‚.Рї.)
+void gfCleanupScene()
+{
+}
+
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РєРѕРіРґР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР°Р¶РёРјР°РµС‚ Р»РµРІСѓСЋ РєРЅРѕРїРєСѓ РјС‹С€Рё
+void gfOnLMouseClick(int x, int y)
+{
+	x; y;
+	gfDrawRectangle(x - 10, y - 10, x + 10, y + 10, RGBPIXEL::Green());
+}
+
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РєРѕРіРґР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР°Р¶РёРјР°РµС‚ РїСЂР°РІСѓСЋ РєРЅРѕРїРєСѓ РјС‹С€Рё
+void gfOnRMouseClick(int x, int y)
+{
+	x; y;
+}
+
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РєРѕРіРґР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР°Р¶РёРјР°РµС‚ РєР»Р°РІРёС€Сѓ РЅР° РєР»Р°РІРёР°С‚СѓСЂРµ
+void gfOnKeyDown(UINT key)
+{
+	key;
+
+	if (key == 'A')
+		gfDisplayMessage("'A' key has been pressed");
+}
+
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РєРѕРіРґР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РѕС‚Р¶РёРјР°РµС‚ РєР»Р°РІРёС€Сѓ РЅР° РєР»Р°РІРёР°С‚СѓСЂРµ
+void gfOnKeyUp(UINT key)
+{
+	key;
+
+	//if( key == 'B' )
+	//    gfDisplayMessage( "'B' key has been un-pressed" );
+}

@@ -1,0 +1,227 @@
+(static_cast<Vector<T>>((static_cast<Vector4<T>>((edges3[0]->get_vector()) * (-1.0)) * mx).NormalizeHom()) ^
+			static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[1]->get_vector()) * mx).NormalizeHom())).z;
+			
+(static_cast<Vector4<T>>((edges3[i]->get_vector()) ^
+					(edges3[(i + 1) % 4 + 8]->get_vector())) * mx).NormalizeHom().z;
+
+(static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^ 
+static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[(i + 1) % 4 + 8]->get_vector()) * mx).NormalizeHom())).z;
+
+(edges3[4]->get_vector())
+(static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[4]->get_vector()) * mx).NormalizeHom()) ^
+static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[5]->get_vector()) * mx).NormalizeHom())).z
+
+(static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^
+static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[(i + 1) % 4 + 8]->get_vector()) * mx).NormalizeHom())).z
+
+(static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[0]->get_vector()) * mx).NormalizeHom()) ^
+static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[9]->get_vector()) * mx).NormalizeHom())).z
+
+(static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^
+static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[3]->get_vector()) * mx).NormalizeHom())).z
+
+(static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^
+static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i % 4 - 1]->get_vector()) * mx).NormalizeHom())).z
+
+(static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^
+static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i - 8]->get_vector()) * mx).NormalizeHom())).z
+
+
+else if(i >= 8) {
+	if (i == 8) {
+		n1 = (static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[8]->get_vector()) * mx).NormalizeHom()) ^
+			static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[3]->get_vector() * (-1.0)) * mx).NormalizeHom())).z;
+	}
+	else {
+		if (i == 9) {
+			n1 = (static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^
+				static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i % 4 - 1]->get_vector() * (-1.0)) * mx).NormalizeHom())).z;
+		}
+		else {
+			n1 = (static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^
+				static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i % 4 - 1]->get_vector()) * mx).NormalizeHom())).z;
+		}
+	}
+	n2 = (static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i]->get_vector()) * mx).NormalizeHom()) ^
+		static_cast<Vector<T>>((static_cast<Vector4<T>>(edges3[i - 8]->get_vector() * (-1.0)) * mx).NormalizeHom())).z;
+}
+if (n1 > DBL_EPSILON && n2 > DBL_EPSILON) continue;
+
+---
+
+template <typename T>
+class Parallelepiped {
+	Edge3<T> **edges3;
+	//Конструктор по умоляанию - единичный куб
+public:
+	Parallelepiped() {
+		edges3 = new Edge3<T>*[12];
+		edges3[0] = new Edge3<T>(Vector<T>(0, 0, 0), Vector<T>(0, 100, 0));
+		edges3[1] = new Edge3<T>(Vector<T>(0, 0, 0), Vector<T>(0, 0, 100));
+		edges3[2] = new Edge3<T>(Vector<T>(0, 0, 100), Vector<T>(0, 100, 100));
+		edges3[3] = new Edge3<T>(Vector<T>(0, 100, 100), Vector<T>(0, 100, 0));
+		edges3[4] = new Edge3<T>(Vector<T>(100, 0, 0), Vector<T>(100, 100, 0));
+		edges3[5] = new Edge3<T>(Vector<T>(100, 0, 0), Vector<T>(100, 0, 100));
+		edges3[6] = new Edge3<T>(Vector<T>(100, 0, 100), Vector<T>(100, 100, 100));
+		edges3[7] = new Edge3<T>(Vector<T>(100, 100, 100), Vector<T>(100, 100, 0));
+		edges3[8] = new Edge3<T>(Vector<T>(0, 0, 0), Vector<T>(100, 0, 0));
+		edges3[9] = new Edge3<T>(Vector<T>(0, 0, 100), Vector<T>(100, 0, 100));
+		edges3[10] = new Edge3<T>(Vector<T>(0, 100, 100), Vector<T>(100, 100, 100));
+		edges3[11] = new Edge3<T>(Vector<T>(0, 100, 0), Vector<T>(100, 100, 0));
+	}
+
+	Parallelepiped(Vector<T> **v_) {
+		edges3 = new Edge3<T>*[12];
+		for (int i = 0; i < 4; i++) {
+			edges3[i] = new Edge3<T>(*(v_[i]), *(v_[(i + 1) % 4]));
+		}
+		for (int i = 0; i < 4; i++) {
+			edges3[i + 4] = new Edge3<T>(*v_[i + 4], *v_[(i + 1) % 4 + 4]);
+		}
+		for (int i = 0; i < 4; i++) {
+			edges3[i + 8] = new Edge3<T>(*v_[i], *v_[i + 4]);
+		}
+	}
+
+	Parallelepiped(Edge3<T> **edges3_) : edges3(edges3_) {}
+
+	void draw(const Matrix<T>& mx, RGBPIXEL color) {
+		Edge3<T> *cur;
+		Vector<T> *first, *second;
+		Vector4<T> new_first, new_second;
+		for (int i = 0; i < 12; i++) {
+			cur = edges3[i];
+			first = &cur->get_start();
+			second = &cur->get_end();
+			new_first = static_cast<Vector4<T>>(*first) * mx;
+			new_second = static_cast<Vector4<T>>(*second) * mx;
+			DrawLine(Edge<T>(static_cast<Point<T>>(new_first.NormalizeHom()), 
+				static_cast<Point<T>>(new_second.NormalizeHom())), color);
+		}
+	}
+
+	template <typename T>
+	T get_z(const Vector<T>& first, const Vector<T>& second, const Matrix<T>& mx) {
+		return (((static_cast<Vector4<T>>(first) * mx).NormalizeHom()) ^
+			(static_cast<Vector4<T>>(second) * mx).NormalizeHom()).z;
+	}
+
+	void draw_delete_edges(const Matrix<T>& mx) {
+		Edge3<T> *cur;
+		Vector<T> *first, *second;
+		Vector4<T> new_first, new_second;
+		double n1 = ((edges3[0]->projection(mx)) ^ (edges3[1]->projection(mx))).z;
+		double n2;
+		RGBPIXEL color;
+		for (int i = 0; i < 12; i++) {
+			if (i == 0)color = RGBPIXEL::White();
+			if (i == 1)color = RGBPIXEL::White();
+			if (i == 2)color = RGBPIXEL::White();
+			if (i == 3)color = RGBPIXEL::White();
+			if (i == 4)color = RGBPIXEL::Blue();
+			if (i == 5)color = RGBPIXEL::Yellow();
+			if (i == 6)color = RGBPIXEL::Red();
+			if (i == 7)color = RGBPIXEL::Green();
+			if (i == 8)color = RGBPIXEL::White();
+			if (i == 9)color = RGBPIXEL::White();
+			if (i == 10)color = RGBPIXEL::White();
+			if (i == 11)color = RGBPIXEL::White();
+			cur = edges3[i];
+			first = &cur->get_start();
+			second = &cur->get_end();
+			new_first = static_cast<Vector4<T>>(*first) * mx;
+			new_second = static_cast<Vector4<T>>(*second) * mx;
+			if (i < 4) {
+				n2 = ((edges3[i]->projection(mx) * (-1.0)) ^ (edges3[(i + 1) % 4 + 8]->projection(mx))).z;
+			}
+			else if (i >= 4 && i < 8) {
+				if (i == 4) n1 = ((edges3[4]->projection(mx) * (-1.0)) ^ (edges3[5]->projection(mx))).z; 
+				n2 = ((edges3[i]->projection(mx)) ^ (edges3[(i + 1) % 4 + 8]->projection(mx) * (-1.0))).z;
+				/*
+				if (i == 7) {
+					gfDrawText(100, 100, std::to_string(n1).c_str(), RGBPIXEL(0, 128, 255));
+					gfDrawText(100, 125, (std::to_string((edges3[4]->projection(mx) * (-1.0)).x) + " " + std::to_string((edges3[4]->projection(mx) * (-1.0)).y) + " " + std::to_string((edges3[4]->projection(mx) * (-1.0)).z)).c_str(), RGBPIXEL(0, 128, 255));
+					gfDrawText(100, 150, (std::to_string((edges3[5]->projection(mx)).x) + " " + std::to_string((edges3[5]->projection(mx)).y) + " " + std::to_string((edges3[5]->projection(mx)).z)).c_str(), RGBPIXEL(0, 128, 255));
+					gfDrawText(100, 100, std::to_string(n2).c_str(), RGBPIXEL(0, 128, 255));
+					gfDrawText(100, 125, (std::to_string((edges3[i]->projection(mx)).x) + " " + std::to_string((edges3[i]->projection(mx)).y) + " " + std::to_string((edges3[i]->projection(mx)).z)).c_str(), RGBPIXEL(0, 128, 255));
+					gfDrawText(100, 150, (std::to_string((edges3[(i + 1) % 4 + 8]->projection(mx)).x) + " " + std::to_string((edges3[(i + 1) % 4 + 8]->projection(mx)).y) + " " + std::to_string((edges3[(i + 1) % 4 + 8]->projection(mx)).z)).c_str(), RGBPIXEL(0, 128, 255));
+				}
+				*/
+			}
+			else if (i >= 8 && i < 12) {
+				n1 = ((edges3[i]->projection(mx)) ^ (edges3[i - 4]->projection(mx))).z;
+				n2 = ((edges3[i]->projection(mx)) ^ (edges3[(i - 1) % 4 + 4]->projection(mx))).z;
+			}
+			if (n1 > DBL_EPSILON && n2 > DBL_EPSILON)continue;
+			DrawLine(Edge<T>(static_cast<Point<T>>(new_first.NormalizeHom()),
+				static_cast<Point<T>>(new_second.NormalizeHom())), color);
+		}
+	}
+
+	void draw_parallel(double n, RGBPIXEL color) {
+		Matrix<double> mx_(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, n, 1);
+		//draw(mx_, color);
+		draw_delete_edges(mx_, color);
+	}
+
+	void draw_perspective(double n, RGBPIXEL color) {
+		Matrix<double> mx_(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -(double)1 / n, 0, 0, 0, 1);
+		//draw(mx_, color);
+		draw_delete_edges(mx_);
+	}
+
+	void draw_parallel_rotate(double n, const Vector<T>& v, double fi, RGBPIXEL color) {
+		double r = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+		Vector<T> v_(v.x / r, v.y / r, v.z / r);
+		Matrix<double> mx_rot;
+		mx_rot = mx_rot.RotationTransform(v_, fi);
+		Matrix<double> mx_(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, n, 1);
+		//draw(mx_rot * mx_, color);
+		draw_delete_edges(mx_rot * mx_);
+	}
+
+	void draw_perspective_rotate(double n, const Vector<T>& v, double fi, RGBPIXEL color) {
+		double r = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+		Vector<T> v_(v.x / r, v.y / r, v.z / r);
+		Matrix<double> mx_rot;
+		mx_rot = mx_rot.RotationTransform(v_, fi);
+		Matrix<double> mx_(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -(double)1 / n, 0, 0, 0, 1);
+		//draw(mx_rot * mx_, color);
+		draw_delete_edges(mx_rot * mx_);
+	}
+};
+
+
+---
+
+int n = 1000;
+	Matrix<double> mx_rot;
+	Matrix<double> mx_(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, (double)-1 / n, 0, 0, 0, 1);
+	double r = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	Vector<double> v_(v.x / r, v.y / r, v.z / r);
+	p->draw_delete_edges(mx_rot.RotationTransform(v_, 30 * 2 * M_PI / 360) * mx_);
+	
+---
+
+	Vector4<int> v(1, 2, 3, 4);
+	Matrix<int> mx(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	Vector4<int> v_2 = v * mx;
+	int s = 0;
+	for (int i = 0; i < 4; i++) {
+		s += v_2[i];
+	}
+	gfDrawText(100, 100, std::to_string(s).c_str(), RGBPIXEL(0, 128, 255));
+	
+	Vector4<int> v_2 = (v * m);
+	int s = 0;
+	for (int i = 0; i < 4; i++) {
+		s += v_2[i];
+	}
+	gfDrawText(100, 100, std::to_string(s).c_str(), RGBPIXEL(0, 128, 255));
+	
+		while (true) {
+		gfClearScreen(RGBPIXEL::Black());
+		p.draw(mx, RGBPIXEL::Blue());
+		mx.RotationTransform(v, 0.785);
+	}
+	
